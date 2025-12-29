@@ -1,0 +1,372 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PROJECT_MANAGER
+  PROJECT_CONTROL_ENGINEER
+  PLANNING_ENGINEER
+  COST_ENGINEER
+  DOCUMENT_CONTROLLER
+  DISCIPLINE_ENGINEER
+  CLIENT
+  EXECUTIVE
+  ADMIN
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum DocumentStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  OBSOLETE
+}
+
+enum ChangeOrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IMPLEMENTED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(DISCIPLINE_ENGINEER)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects          ProjectMember[]
+  createdProjects   Project[]         @relation("ProjectCreator")
+  costEntries       CostEntry[]
+  progressUpdates   ProgressUpdate[]
+  documents         Document[]
+  comments          Comment[]
+
+  @@map("users")
+}
+
+model Project {
+  id              String        @id @default(uuid())
+  code            String        @unique
+  name            String
+  description     String?
+  location        String?
+  client          String?
+  contractor      String?
+  status          ProjectStatus @default(PLANNING)
+  startDate       DateTime
+  endDate         DateTime
+  totalBudget     Decimal       @db.Decimal(15, 2)
+  currency        String        @default("USD")
+  createdById     String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  createdBy        User                @relation("ProjectCreator", fields: [createdById], references: [id])
+  members          ProjectMember[]
+  wbs              WBS[]
+  costCodes        CostCode[]
+  costEntries      CostEntry[]
+  schedules        Schedule[]
+  milestones       Milestone[]
+  scheduleBaselines ScheduleBaseline[]
+  documents        Document[]
+  risks            Risk[]
+  changeOrders     ChangeOrder[]
+  progressReports  ProgressReport[]
+  progressUpdates  ProgressUpdate[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      UserRole
+  joinedAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model WBS {
+  id          String   @id @default(uuid())
+  projectId   String
+  code        String
+  name        String
+  description String?
+  parentId    String?
+  level       Int
+  weightage   Decimal  @db.Decimal(5, 2)
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project      Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parent       WBS?             @relation("WBSHierarchy", fields: [parentId], references: [id])
+  children     WBS[]            @relation("WBSHierarchy")
+  costCodes    CostCode[]
+  schedules    Schedule[]
+  progress     ProgressUpdate[]
+
+  @@unique([projectId, code])
+  @@map("wbs")
+}
+
+model CostCode {
+  id          String   @id @default(uuid())
+  projectId   String
+  wbsId       String?
+  code        String
+  name        String
+  description String?
+  category    String
+  budget      Decimal  @db.Decimal(15, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  wbs         WBS?        @relation(fields: [wbsId], references: [id])
+  costEntries CostEntry[]
+
+  @@unique([projectId, code])
+  @@map("cost_codes")
+}
+
+model CostEntry {
+  id          String   @id @default(uuid())
+  projectId   String
+  costCodeId  String
+  description String
+  amount      Decimal  @db.Decimal(15, 2)
+  entryDate   DateTime
+  entryType   String
+  reference   String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  costCode  CostCode @relation(fields: [costCodeId], references: [id])
+  createdBy User     @relation(fields: [createdById], references: [id])
+
+  @@map("cost_entries")
+}
+
+model Schedule {
+  id             String    @id @default(uuid())
+  projectId      String
+  wbsId          String?
+  taskName       String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime
+  duration       Int
+  progress       Decimal   @db.Decimal(5, 2) @default(0)
+  isCritical     Boolean   @default(false)
+  predecessors   String[]
+  resources      String[]
+  plannedHours   Decimal?  @db.Decimal(10, 2)
+  actualHours    Decimal?  @db.Decimal(10, 2)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  project       Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  wbs           WBS?                   @relation(fields: [wbsId], references: [id])
+  baselineTasks ScheduleBaselineTask[]
+
+  @@map("schedules")
+}
+
+model Milestone {
+  id          String   @id @default(uuid())
+  projectId   String
+  name        String
+  description String?
+  targetDate  DateTime
+  actualDate  DateTime?
+  status      String
+  critical    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("milestones")
+}
+
+model ScheduleBaseline {
+  id           String   @id @default(uuid())
+  projectId    String
+  name         String
+  description  String?
+  baselineDate DateTime @default(now())
+  isActive     Boolean  @default(false)
+  createdById  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  project Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks   ScheduleBaselineTask[]
+
+  @@map("schedule_baselines")
+}
+
+model ScheduleBaselineTask {
+  id              String   @id @default(uuid())
+  baselineId      String
+  scheduleId      String
+  taskName        String
+  plannedStart    DateTime
+  plannedEnd      DateTime
+  plannedDuration Int
+  plannedProgress Decimal  @db.Decimal(5, 2) @default(0)
+  wbsId           String?
+  createdAt       DateTime @default(now())
+
+  baseline ScheduleBaseline @relation(fields: [baselineId], references: [id], onDelete: Cascade)
+  schedule Schedule         @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@map("schedule_baseline_tasks")
+}
+
+model ProgressUpdate {
+  id             String   @id @default(uuid())
+  projectId      String
+  wbsId          String
+  reportDate     DateTime
+  physicalProgress Decimal @db.Decimal(5, 2)
+  plannedProgress  Decimal @db.Decimal(5, 2)
+  manhours       Decimal? @db.Decimal(10, 2)
+  remarks        String?
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  wbs       WBS     @relation(fields: [wbsId], references: [id], onDelete: Cascade)
+  createdBy User    @relation(fields: [createdById], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("progress_updates")
+}
+
+model ProgressReport {
+  id          String   @id @default(uuid())
+  projectId   String
+  reportDate  DateTime
+  reportType  String
+  plannedValue Decimal @db.Decimal(15, 2)
+  earnedValue  Decimal @db.Decimal(15, 2)
+  actualCost   Decimal @db.Decimal(15, 2)
+  cpi         Decimal  @db.Decimal(5, 4)
+  spi         Decimal  @db.Decimal(5, 4)
+  remarks     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("progress_reports")
+}
+
+model Document {
+  id            String         @id @default(uuid())
+  projectId     String
+  documentNo    String
+  title         String
+  description   String?
+  category      String
+  discipline    String?
+  revision      String         @default("A")
+  status        DocumentStatus @default(DRAFT)
+  filePath      String
+  fileSize      Int
+  mimeType      String
+  uploadedById  String
+  uploadedAt    DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedBy User      @relation(fields: [uploadedById], references: [id])
+  comments   Comment[]
+
+  @@unique([projectId, documentNo, revision])
+  @@map("documents")
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  documentId String
+  userId     String
+  content    String
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@map("comments")
+}
+
+model Risk {
+  id          String   @id @default(uuid())
+  projectId   String
+  title       String
+  description String
+  category    String
+  probability Int
+  impact      Int
+  riskScore   Int
+  mitigation  String?
+  status      String   @default("Open")
+  owner       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("risks")
+}
+
+model ChangeOrder {
+  id          String            @id @default(uuid())
+  projectId   String
+  coNumber    String
+  title       String
+  description String
+  reason      String
+  costImpact  Decimal           @db.Decimal(15, 2)
+  timeImpact  Int
+  status      ChangeOrderStatus @default(PENDING)
+  requestedBy String
+  requestDate DateTime          @default(now())
+  approvedBy  String?
+  approvedDate DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, coNumber])
+  @@map("change_orders")
+}

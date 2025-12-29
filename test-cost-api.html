@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cost Code API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2 px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Cost Code API Test</h1>
+        <p>This page tests the Cost Code API endpoints</p>
+        
+        <div class="step">
+            <h3>Step 1: Login</h3>
+            <button onclick="testLogin()">Test Login</button>
+            <div id="loginResult"></div>
+        </div>
+        
+        <div class="step">
+            <h3>Step 2: Get Projects</h3>
+            <button onclick="testGetProjects()" id="btnGetProjects" disabled>Get Projects</button>
+            <div id="projectsResult"></div>
+        </div>
+        
+        <div class="step">
+            <h3>Step 3: Get Cost Codes</h3>
+            <button onclick="testGetCostCodes()" id="btnGetCostCodes" disabled>Get Cost Codes</button>
+            <div id="costCodesResult"></div>
+        </div>
+        
+        <div class="step">
+            <h3>Step 4: Create Cost Code</h3>
+            <button onclick="testCreateCostCode()" id="btnCreateCostCode" disabled>Create Cost Code</button>
+            <div id="createResult"></div>
+        </div>
+        
+        <div class="step">
+            <h3>Step 5: Update Cost Code</h3>
+            <button onclick="testUpdateCostCode()" id="btnUpdateCostCode" disabled>Update Cost Code</button>
+            <div id="updateResult"></div>
+        </div>
+        
+        <div class="step">
+            <h3>Step 6: Delete Cost Code</h3>
+            <button onclick="testDeleteCostCode()" id="btnDeleteCostCode" disabled>Delete Cost Code</button>
+            <div id="deleteResult"></div>
+        </div>
+        
+        <h3>📋 Test Log</h3>
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        let token = null;
+        let projectId = null;
+        let createdCostCodeId = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            logDiv.innerHTML += `<div class="log-entry ${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function testLogin() {
+            log('Attempting login...');
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@epc.com',
+                        password: 'admin123'
+                    })
+                });
+
+                if (!response.ok) throw new Error('Login failed');
+
+                const data = await response.json();
+                token = data.access_token;
+                
+                document.getElementById('loginResult').innerHTML = 
+                    `<span class="success">✓ Login successful!</span><br>Token: ${token.substring(0, 30)}...`;
+                log('Login successful!', 'success');
+                
+                // Enable next step
+                document.getElementById('btnGetProjects').disabled = false;
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    `<span class="error">✗ Error: ${error.message}</span>`;
+                log(`Login failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetProjects() {
+            log('Fetching projects...');
+            try {
+                const response = await fetch('http://localhost:3001/api/projects', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch projects');
+
+                const projects = await response.json();
+                projectId = projects[0].id;
+                
+                document.getElementById('projectsResult').innerHTML = 
+                    `<span class="success">✓ Found ${projects.length} project(s)</span><br>` +
+                    `Using: ${projects[0].name} (${projects[0].code})`;
+                log(`Found ${projects.length} projects. Using: ${projects[0].name}`, 'success');
+                
+                // Enable next step
+                document.getElementById('btnGetCostCodes').disabled = false;
+            } catch (error) {
+                document.getElementById('projectsResult').innerHTML = 
+                    `<span class="error">✗ Error: ${error.message}</span>`;
+                log(`Failed to fetch projects: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetCostCodes() {
+            log('Fetching cost codes...');
+            try {
+                const response = await fetch(`http://localhost:3001/api/cost/codes?projectId=${projectId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch cost codes');
+
+                const costCodes = await response.json();
+                
+                let resultHtml = `<span class="success">✓ Found ${costCodes.length} cost code(s)</span><br>`;
+                if (costCodes.length > 0) {
+                    resultHtml += '<ul style="margin:10px 0; padding-left: 20px;">';
+                    costCodes.forEach(cc => {
+                        resultHtml += `<li>${cc.code}: ${cc.name} ($${cc.budget})</li>`;
+                    });
+                    resultHtml += '</ul>';
+                }
+                
+                document.getElementById('costCodesResult').innerHTML = resultHtml;
+                log(`Found ${costCodes.length} existing cost codes`, 'success');
+                
+                // Enable next step
+                document.getElementById('btnCreateCostCode').disabled = false;
+            } catch (error) {
+                document.getElementById('costCodesResult').innerHTML = 
+                    `<span class="error">✗ Error: ${error.message}</span>`;
+                log(`Failed to fetch cost codes: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateCostCode() {
+            log('Creating new cost code...');
+            try {
+                const response = await fetch('http://localhost:3001/api/cost/codes', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        projectId: projectId,
+                        code: 'TEST-' + Date.now(),
+                        name: 'Test Cost Code',
+                        description: 'Created by API test',
+                        category: 'MATERIAL',
+                        budget: 50000.00
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to create cost code');
+
+                const costCode = await response.json();
+                createdCostCodeId = costCode.id;
+                
+                document.getElementById('createResult').innerHTML = 
+                    `<span class="success">✓ Cost code created!</span><br>` +
+                    `ID: ${costCode.id}<br>` +
+                    `Code: ${costCode.code}<br>` +
+                    `Name: ${costCode.name}<br>` +
+                    `Budget: $${costCode.budget}`;
+                log(`Cost code created: ${costCode.code}`, 'success');
+                
+                // Enable next step
+                document.getElementById('btnUpdateCostCode').disabled = false;
+            } catch (error) {
+                document.getElementById('createResult').innerHTML = 
+                    `<span class="error">✗ Error: ${error.message}</span>`;
+                log(`Failed to create cost code: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateCostCode() {
+            log('Updating cost code...');
+            try {
+                const response = await fetch(`http://localhost:3001/api/cost/codes/${createdCostCodeId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Updated Test Cost Code',
+                        budget: 75000.00
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to update cost code');
+
+                const costCode = await response.json();
+                
+                document.getElementById('updateResult').innerHTML = 
+                    `<span class="success">✓ Cost code updated!</span><br>` +
+                    `New Name: ${costCode.name}<br>` +
+                    `New Budget: $${costCode.budget}`;
+                log(`Cost code updated successfully`, 'success');
+                
+                // Enable next step
+                document.getElementById('btnDeleteCostCode').disabled = false;
+            } catch (error) {
+                document.getElementById('updateResult').innerHTML = 
+                    `<span class="error">✗ Error: ${error.message}</span>`;
+                log(`Failed to update cost code: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeleteCostCode() {
+            log('Deleting cost code...');
+            try {
+                const response = await fetch(`http://localhost:3001/api/cost/codes/${createdCostCodeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete cost code');
+
+                document.getElementById('deleteResult').innerHTML = 
+                    `<span class="success">✓ Cost code deleted successfully!</span>`;
+                log('Cost code deleted successfully', 'success');
+                log('=== ALL TESTS PASSED ===', 'success');
+            } catch (error) {
+                document.getElementById('deleteResult').innerHTML = 
+                    `<span class="error">✗ Error: ${error.message}</span>`;
+                log(`Failed to delete cost code: ${error.message}`, 'error');
+            }
+        }
+
+        // Log initial message
+        log('Test page loaded. Click "Test Login" to begin.');
+    </script>
+</body>
+</html>

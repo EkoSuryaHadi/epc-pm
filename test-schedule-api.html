@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Schedule API</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Schedule API</h1>
+  
+  <div>
+    <h3>Step 1: Login</h3>
+    <input type="email" id="email" placeholder="Email" value="admin@example.com">
+    <input type="password" id="password" placeholder="Password" value="password123">
+    <button onclick="login()">Login</button>
+    <div id="loginResult"></div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <h3>Step 2: Get Schedule Tasks</h3>
+    <input type="text" id="projectId" placeholder="Project ID" value="eee0e120-d6cf-4afa-96c6-2c1cfbda5249" style="width: 300px;">
+    <button onclick="getTasks()">Get Tasks</button>
+    <div id="tasksResult"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3001/api';
+    let token = null;
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const resultDiv = document.getElementById('loginResult');
+      
+      try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          token = data.accessToken;
+          resultDiv.innerHTML = `<p class="success">✅ Login successful!</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ Login failed: ${data.message}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+
+    async function getTasks() {
+      const projectId = document.getElementById('projectId').value;
+      const resultDiv = document.getElementById('tasksResult');
+      
+      if (!token) {
+        resultDiv.innerHTML = '<p class="error">❌ Please login first!</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/schedule?projectId=${projectId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `<p class="success">✅ Got ${data.length} tasks</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ Failed: ${data.message}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

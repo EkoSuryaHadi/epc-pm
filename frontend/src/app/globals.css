@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Modern Design Tokens */
+  :root {
+    --primary-50: 239 246 255;
+    --primary-500: 59 130 246;
+    --primary-600: 37 99 235;
+    --primary-700: 29 78 216;
+    
+    --accent-500: 249 115 22;
+    --accent-600: 234 88 12;
+    
+    --success: 16 185 129;
+    --warning: 245 158 11;
+    --error: 239 68 68;
+    
+    --shadow-primary: 0 8px 16px -4px rgb(59 130 246 / 0.3);
+    --shadow-accent: 0 8px 16px -4px rgb(249 115 22 / 0.3);
+  }
+}
+
+/* Frappe Gantt Base Styles */
+:root {
+  --g-arrow-color: #1f2937;
+  --g-bar-color: #fff;
+  --g-bar-border: #fff;
+  --g-tick-color-thick: #ededed;
+  --g-tick-color: #f3f3f3;
+  --g-actions-background: #f3f3f3;
+  --g-border-color: #ebeff2;
+  --g-text-muted: #7c7c7c;
+  --g-text-light: #fff;
+  --g-text-dark: #171717;
+  --g-progress-color: #dbdbdb;
+  --g-handle-color: #37352f;
+  --g-weekend-label-color: #dcdce4;
+  --g-expected-progress: #c4c4e9;
+  --g-header-background: #fff;
+  --g-row-color: #fdfdfd;
+  --g-row-border-color: #c7c7c7;
+  --g-today-highlight: #37352f;
+  --g-popup-actions: #ebeff2;
+  --g-weekend-highlight-color: #f7f7f7;
+}
+
+.gantt-container {
+  line-height: 14.5px;
+  position: relative;
+  overflow: auto;
+  font-size: 12px;
+  height: var(--gv-grid-height);
+  width: 100%;
+  border-radius: 8px;
+}
+
+.gantt-container .popup-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  box-shadow: 0 10px 24px -3px #0003;
+  padding: 10px;
+  border-radius: 5px;
+  width: max-content;
+  z-index: 1000;
+}
+
+.gantt-container .popup-wrapper .title {
+  margin-bottom: 2px;
+  color: var(--g-text-dark);
+  font-size: 0.85rem;
+  font-weight: 650;
+  line-height: 15px;
+}
+
+.gantt-container .popup-wrapper .subtitle {
+  color: var(--g-text-dark);
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+}
+
+.gantt-container .popup-wrapper .details {
+  color: var(--g-text-muted);
+  font-size: 0.7rem;
+}
+
+.gantt-container .grid-header {
+  height: calc(var(--gv-lower-header-height) + var(--gv-upper-header-height) + 10px);
+  background-color: var(--g-header-background);
+  position: sticky;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid var(--g-row-border-color);
+  z-index: 1000;
+}
+
+.gantt .grid-background {
+  fill: none;
+}
+
+.gantt .grid-row {
+  fill: var(--g-row-color);
+}
+
+.gantt .row-line {
+  stroke: var(--g-border-color);
+}
+
+.gantt .tick {
+  stroke: var(--g-tick-color);
+  stroke-width: 0.4;
+}
+
+.gantt .tick.thick {
+  stroke: var(--g-tick-color-thick);
+  stroke-width: 0.7;
+}
+
+.gantt .arrow {
+  fill: none;
+  stroke: var(--g-arrow-color);
+  stroke-width: 1.5;
+}
+
+.gantt .bar-wrapper .bar {
+  fill: var(--g-bar-color);
+  stroke: var(--g-bar-border);
+  stroke-width: 0;
+  transition: stroke-width 0.3s ease;
+  outline: 1px solid var(--g-row-border-color);
+  border-radius: 3px;
+}
+
+.gantt .bar-progress {
+  fill: var(--g-progress-color);
+  border-radius: 4px;
+}
+
+.gantt .bar-label {
+  fill: var(--g-text-dark);
+  dominant-baseline: central;
+  font-family: Helvetica;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.gantt .bar-wrapper {
+  cursor: pointer;
+}
+
+.gantt .bar-wrapper:hover .bar {
+  transition: transform 0.3s ease;
+}
+
+.gantt .handle {
+  fill: var(--g-handle-color);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gantt .handle.active,
+.gantt .handle.visible {
+  cursor: ew-resize;
+  opacity: 1;
+}
+
+/* Gantt Chart Custom Styles */
+.gantt-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.gantt .bar-wrapper .bar {
+  fill: #3b82f6 !important; /* Blue for regular tasks */
+}
+
+.gantt .bar-wrapper.critical-task .bar {
+  fill: #ef4444 !important; /* Red for critical tasks */
+}
+
+.gantt .bar-wrapper .bar-progress {
+  fill: #1d4ed8 !important; /* Darker blue for progress */
+}
+
+.gantt .bar-wrapper.critical-task .bar-progress {
+  fill: #dc2626 !important; /* Darker red for critical progress */
+}
+
+.gantt .bar-wrapper:hover .bar {
+  opacity: 0.8;
+}
+
+.gantt .arrow {
+  stroke: #9ca3af;
+  stroke-width: 1.5;
+}
+
+.gantt .today-highlight {
+  fill: rgba(239, 68, 68, 0.1);
+  stroke: #ef4444;
+  stroke-width: 1;
+}

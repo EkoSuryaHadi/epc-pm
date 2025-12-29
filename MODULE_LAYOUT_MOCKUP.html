@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPC Module Layout Options - Visual Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        .option-header {
+            margin-bottom: 20px;
+        }
+
+        .option-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a202c;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommended-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .option-subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: #f7fafc;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .project-card {
+            background: linear-gradient(to bottom, #f7fafc, #edf2f7);
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .project-header {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .project-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .project-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .quick-access-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .module-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .module-btn {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .module-btn.blue:hover { background: #ebf8ff; border-color: #4299e1; color: #2c5282; }
+        .module-btn.green:hover { background: #f0fff4; border-color: #48bb78; color: #276749; }
+        .module-btn.purple:hover { background: #faf5ff; border-color: #9f7aea; color: #553c9a; }
+        .module-btn.orange:hover { background: #fffaf0; border-color: #ed8936; color: #9c4221; }
+        .module-btn.red:hover { background: #fff5f5; border-color: #fc8181; color: #c53030; }
+        .module-btn.cyan:hover { background: #e6fffa; border-color: #4fd1c5; color: #234e52; }
+        .module-btn.indigo:hover { background: #ebf4ff; border-color: #667eea; color: #434190; }
+        .module-btn.yellow:hover { background: #fefcbf; border-color: #ecc94b; color: #744210; }
+        .module-btn.pink:hover { background: #fff5f7; border-color: #ed64a6; color: #97266d; }
+
+        .module-btn.new {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            font-weight: 700;
+        }
+
+        .module-btn.new:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .icon {
+            font-size: 1rem;
+        }
+
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        .col-span-3 {
+            grid-column: span 3;
+        }
+
+        .pros-cons {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .pros, .cons {
+            margin-bottom: 15px;
+        }
+
+        .pros-title, .cons-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pros-title { color: #38a169; }
+        .cons-title { color: #e53e3e; }
+
+        .pros ul, .cons ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .pros li, .cons li {
+            font-size: 0.85rem;
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .pros li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .cons li::before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            color: #e53e3e;
+        }
+
+        .footer {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-top: 40px;
+        }
+
+        .footer h2 {
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .dropdown-demo {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .dropdown-content {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            display: grid;
+            gap: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .badge-new {
+            background: #fc8181;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Module Layout Options - Visual Mockup</h1>
+        <p class="subtitle">Compare different Quick Access layouts for project modules</p>
+
+        <div class="options-grid">
+            <!-- OPTION A -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-title">
+                        Option A: Complete
+                    </div>
+                    <div class="option-subtitle">All 14 modules accessible</div>
+                    <div class="stats">
+                        <span class="stat">14 Buttons</span>
+                        <span class="stat">5x3 Grid</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Sample Project</div>
+                        <div class="project-info">
+                            <span>📍 Jakarta</span>
+                            <span>💰 $15.00M</span>
+                            <span>🟢 Active</span>
+                        </div>
+                    </div>
+
+                    <div class="quick-access-label">QUICK ACCESS</div>
+                    <div class="module-grid grid-3">
+                        <div class="module-btn blue"><span class="icon">📊</span> Dashboard</div>
+                        <div class="module-btn blue"><span class="icon">📁</span> WBS</div>
+                        <div class="module-btn green"><span class="icon">💰</span> Cost</div>
+                        
+                        <div class="module-btn purple"><span class="icon">📅</span> Schedule</div>
+                        <div class="module-btn cyan"><span class="icon">🚩</span> Milestones</div>
+                        <div class="module-btn indigo"><span class="icon">📈</span> Progress</div>
+                        
+                        <div class="module-btn orange"><span class="icon">📄</span> Docs</div>
+                        <div class="module-btn red"><span class="icon">⚠️</span> Risks</div>
+                        <div class="module-btn purple"><span class="icon">📊</span> Gantt</div>
+                        
+                        <div class="module-btn new"><span class="icon">📊</span> KPI <span class="badge-new">NEW</span></div>
+                        <div class="module-btn new"><span class="icon">💹</span> EVM <span class="badge-new">NEW</span></div>
+                        <div class="module-btn new"><span class="icon">🔄</span> Changes <span class="badge-new">NEW</span></div>
+                        
+                        <div class="module-btn new"><span class="icon">💵</span> Cost Entry <span class="badge-new">NEW</span></div>
+                        <div class="module-btn new"><span class="icon">📊</span> Cost Analysis <span class="badge-new">NEW</span></div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <div class="pros-title">✓ Pros:</div>
+                        <ul>
+                            <li>Complete access to all modules</li>
+                            <li>No navigation needed</li>
+                            <li>Everything at fingertips</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <div class="cons-title">⚠ Cons:</div>
+                        <ul>
+                            <li>Card becomes tall</li>
+                            <li>Might feel cluttered</li>
+                            <li>Overwhelming for new users</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPTION B -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-title">
+                        Option B: Balanced
+                        <span class="recommended-badge">⭐ RECOMMENDED</span>
+                    </div>
+                    <div class="option-subtitle">Most important modules</div>
+                    <div class="stats">
+                        <span class="stat">12 Buttons</span>
+                        <span class="stat">4x3 Grid</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Sample Project</div>
+                        <div class="project-info">
+                            <span>📍 Jakarta</span>
+                            <span>💰 $15.00M</span>
+                            <span>🟢 Active</span>
+                        </div>
+                    </div>
+
+                    <div class="quick-access-label">QUICK ACCESS</div>
+                    <div class="module-grid grid-3">
+                        <div class="module-btn blue"><span class="icon">📊</span> Dashboard</div>
+                        <div class="module-btn blue"><span class="icon">📁</span> WBS</div>
+                        <div class="module-btn green"><span class="icon">💰</span> Cost</div>
+                        
+                        <div class="module-btn purple"><span class="icon">📅</span> Schedule</div>
+                        <div class="module-btn cyan"><span class="icon">🚩</span> Milestones</div>
+                        <div class="module-btn indigo"><span class="icon">📈</span> Progress</div>
+                        
+                        <div class="module-btn orange"><span class="icon">📄</span> Docs</div>
+                        <div class="module-btn red"><span class="icon">⚠️</span> Risks</div>
+                        <div class="module-btn purple"><span class="icon">📊</span> Gantt</div>
+                        
+                        <div class="module-btn new"><span class="icon">📊</span> KPI <span class="badge-new">NEW</span></div>
+                        <div class="module-btn new"><span class="icon">💹</span> EVM <span class="badge-new">NEW</span></div>
+                        <div class="module-btn new"><span class="icon">🔄</span> Changes <span class="badge-new">NEW</span></div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <div class="pros-title">✓ Pros:</div>
+                        <ul>
+                            <li>Balanced layout</li>
+                            <li>Includes critical KPI & EVM</li>
+                            <li>Not cluttered</li>
+                            <li>Good organization</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <div class="cons-title">⚠ Cons:</div>
+                        <ul>
+                            <li>Cost Entry/Analysis not shown</li>
+                            <li>Slightly taller than current</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPTION C -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-title">
+                        Option C: Current
+                    </div>
+                    <div class="option-subtitle">Keep as-is (minimal)</div>
+                    <div class="stats">
+                        <span class="stat">9 Buttons</span>
+                        <span class="stat">3x3 Grid</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Sample Project</div>
+                        <div class="project-info">
+                            <span>📍 Jakarta</span>
+                            <span>💰 $15.00M</span>
+                            <span>🟢 Active</span>
+                        </div>
+                    </div>
+
+                    <div class="quick-access-label">QUICK ACCESS</div>
+                    <div class="module-grid grid-3">
+                        <div class="module-btn blue"><span class="icon">📊</span> Dashboard</div>
+                        <div class="module-btn blue"><span class="icon">📁</span> WBS</div>
+                        <div class="module-btn green"><span class="icon">💰</span> Cost</div>
+                        
+                        <div class="module-btn purple"><span class="icon">📅</span> Schedule</div>
+                        <div class="module-btn cyan"><span class="icon">🚩</span> Milestones</div>
+                        <div class="module-btn indigo"><span class="icon">📈</span> Progress</div>
+                        
+                        <div class="module-btn orange"><span class="icon">📄</span> Docs</div>
+                        <div class="module-btn red"><span class="icon">⚠️</span> Risks</div>
+                        <div class="module-btn purple"><span class="icon">📊</span> Gantt</div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <div class="pros-title">✓ Pros:</div>
+                        <ul>
+                            <li>Clean & minimal</li>
+                            <li>Perfect 3x3 grid</li>
+                            <li>Easy to scan</li>
+                            <li>Not overwhelming</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <div class="cons-title">⚠ Cons:</div>
+                        <ul>
+                            <li>Missing KPI dashboard</li>
+                            <li>No EVM quick access</li>
+                            <li>Change Orders hidden</li>
+                            <li>Need extra clicks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPTION D -->
+            <div class="option-card">
+                <div class="option-header">
+                    <div class="option-title">
+                        Option D: Dropdown
+                    </div>
+                    <div class="option-subtitle">Progressive disclosure</div>
+                    <div class="stats">
+                        <span class="stat">9 + More</span>
+                        <span class="stat">Dropdown</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Sample Project</div>
+                        <div class="project-info">
+                            <span>📍 Jakarta</span>
+                            <span>💰 $15.00M</span>
+                            <span>🟢 Active</span>
+                        </div>
+                    </div>
+
+                    <div class="quick-access-label">QUICK ACCESS</div>
+                    <div class="module-grid grid-3">
+                        <div class="module-btn blue"><span class="icon">📊</span> Dashboard</div>
+                        <div class="module-btn blue"><span class="icon">📁</span> WBS</div>
+                        <div class="module-btn green"><span class="icon">💰</span> Cost</div>
+                        
+                        <div class="module-btn purple"><span class="icon">📅</span> Schedule</div>
+                        <div class="module-btn cyan"><span class="icon">🚩</span> Milestones</div>
+                        <div class="module-btn indigo"><span class="icon">📈</span> Progress</div>
+                        
+                        <div class="module-btn orange"><span class="icon">📄</span> Docs</div>
+                        <div class="module-btn red"><span class="icon">⚠️</span> Risks</div>
+                        <div class="module-btn purple"><span class="icon">📊</span> Gantt</div>
+                    </div>
+
+                    <div class="dropdown-demo">
+                        <div class="dropdown-trigger">
+                            <span>⚙️ More Modules (5)</span>
+                            <span>▼</span>
+                        </div>
+                        <div class="dropdown-content">
+                            <div class="module-btn new"><span class="icon">📊</span> KPI Dashboard</div>
+                            <div class="module-btn new"><span class="icon">💹</span> EVM</div>
+                            <div class="module-btn new"><span class="icon">🔄</span> Change Orders</div>
+                            <div class="module-btn new"><span class="icon">💵</span> Cost Entries</div>
+                            <div class="module-btn new"><span class="icon">📊</span> Cost Analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <div class="pros-title">✓ Pros:</div>
+                        <ul>
+                            <li>Clean main view</li>
+                            <li>Progressive disclosure</li>
+                            <li>Professional look</li>
+                            <li>All modules available</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <div class="cons-title">⚠ Cons:</div>
+                        <ul>
+                            <li>Extra click needed</li>
+                            <li>Modules less discoverable</li>
+                            <li>More complex code</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h2>📊 Choose Your Preferred Layout</h2>
+            <p style="color: #718096; margin-bottom: 30px;">Which option best fits your workflow?</p>
+            <div class="footer-buttons">
+                <button class="choice-btn" onclick="alert('You chose Option A: Complete (14 modules)')">
+                    Choose Option A
+                </button>
+                <button class="choice-btn" onclick="alert('You chose Option B: Balanced (12 modules) - RECOMMENDED ⭐')">
+                    Choose Option B ⭐
+                </button>
+                <button class="choice-btn" onclick="alert('You chose Option C: Keep Current (9 modules)')">
+                    Choose Option C
+                </button>
+                <button class="choice-btn" onclick="alert('You chose Option D: Dropdown')">
+                    Choose Option D
+                </button>
+            </div>
+            <p style="color: #a0aec0; margin-top: 30px; font-size: 0.9rem;">
+                💡 Tip: Option B (Balanced) is recommended for most users - includes critical modules while staying organized
+            </p>
+        </div>
+    </div>
+</body>
+</html>
