@@ -76,7 +76,7 @@ async function fixProjectWBS(projectId: string) {
   // Fix "2.2 Material Procurement" -> should be child of "2"
   const materialProc = allWBS.find((w) => w.code === '2.2');
   const procurementParent = allWBS.find((w) => w.code === '2');
-  
+
   if (materialProc && procurementParent && !materialProc.parentId) {
     console.log(`   ✓ Fixing: ${materialProc.code} ${materialProc.name} -> parent: ${procurementParent.code}`);
     await prisma.wBS.update({
@@ -136,7 +136,7 @@ async function fixProjectWBS(projectId: string) {
 
   // Step 5: Fix order fields
   console.log('\n📋 Fixing Order Fields...');
-  
+
   // Root level order
   const rootOrderMap: { [key: string]: number } = {
     '1': 1,
@@ -159,7 +159,7 @@ async function fixProjectWBS(projectId: string) {
   const procChildren = await prisma.wBS.findMany({
     where: { parentId: procurementParent?.id },
   });
-  
+
   const childOrderMap: { [key: string]: number } = {
     '2.1': 1,
     '2.2': 2,
@@ -186,7 +186,7 @@ async function fixProjectWBS(projectId: string) {
   });
 
   const currentRootTotal = currentRootItems.reduce((sum, w) => sum + Number(w.weightage), 0);
-  
+
   if (Math.abs(currentRootTotal - 100) > 0.01) {
     console.log(`   Current root total: ${currentRootTotal.toFixed(2)}%`);
     console.log('   Adjusting to 100% proportionally...');
@@ -213,11 +213,11 @@ async function fixProjectWBS(projectId: string) {
     });
 
     const childTotal = materialChildren.reduce((sum, w) => sum + Number(w.weightage), 0);
-    
+
     if (Math.abs(childTotal - 100) > 0.01) {
       console.log(`\n   Children of 2.2: Current total ${childTotal.toFixed(2)}%`);
       console.log('   Adjusting to 100% (25% each)...');
-      
+
       for (const child of materialChildren) {
         await prisma.wBS.update({
           where: { id: child.id },
@@ -245,7 +245,7 @@ async function fixProjectWBS(projectId: string) {
     console.log(`   - ${w.code} ${w.name}: ${Number(w.weightage).toFixed(2)}%`);
   });
   console.log(`   Total: ${finalRootTotal.toFixed(2)}%`);
-  
+
   if (Math.abs(finalRootTotal - 100) < 0.01) {
     console.log('   ✅ Root weightage is VALID (100%)');
   } else {
@@ -258,7 +258,7 @@ async function fixProjectWBS(projectId: string) {
     return acc;
   }, {} as Record<string, number>);
 
-  const duplicates = Object.entries(codeCounts).filter(([_, count]) => count > 1);
+  const duplicates = Object.entries(codeCounts).filter(([_, count]: [string, number]) => count > 1);
   if (duplicates.length > 0) {
     console.log('\n   ⚠️  Duplicate codes found:');
     duplicates.forEach(([code, count]) => console.log(`      - ${code}: ${count} occurrences`));
