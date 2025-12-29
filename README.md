@@ -6,6 +6,10 @@
 ![Backend](https://img.shields.io/badge/Backend-NestJS%2010-red)
 ![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014-black)
 ![Database](https://img.shields.io/badge/Database-PostgreSQL%2016-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue)
+![Node](https://img.shields.io/badge/Node-%3E%3D18.x-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
 
 ## ✨ Features
 
