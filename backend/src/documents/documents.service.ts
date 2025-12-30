@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Multer } from 'multer';
 import * as fs from 'fs';
 import * as path from 'path';
 
 @Injectable()
 export class DocumentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
-  async uploadFile(file: Express.Multer.File, metadata: any, userId: string) {
+  async uploadFile(file: Multer.File, metadata: any, userId: string) {
     const documentData = {
       projectId: metadata.projectId,
       documentNo: metadata.documentNo,
@@ -103,7 +104,7 @@ export class DocumentsService {
 
   async remove(id: string) {
     const document = await this.prisma.document.findUnique({ where: { id } });
-    
+
     if (document && document.filePath) {
       try {
         if (fs.existsSync(document.filePath)) {
@@ -113,7 +114,7 @@ export class DocumentsService {
         console.error('Error deleting file:', error);
       }
     }
-    
+
     return this.prisma.document.delete({ where: { id } });
   }
 
